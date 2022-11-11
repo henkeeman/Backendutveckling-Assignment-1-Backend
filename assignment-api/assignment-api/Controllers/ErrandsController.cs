@@ -28,6 +28,7 @@ namespace assignment_api.Controllers
                     Id = errand.Id,
                     Email = errand.Email,
                     Title = errand.Title,
+                    Created = errand.Created,
                     Description = errand.Description,
                     Status = errand.StatusId
                 });
