@@ -11,5 +11,7 @@ namespace assignment_api.Data
 
         public DbSet<ErrandEntity> Errands { get; set; }
         public DbSet<StatusEntity> Status { get; set; }
+        public DbSet<UserEntity> Users { get; set; }
+        public DbSet<CommentEntity> Comments { get; set; }
     }
 }

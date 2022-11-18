@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using assignment_api.Data;
 
@@ -11,9 +12,10 @@ using assignment_api.Data;
 namespace assignment_api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221118173521_adding tables for VG")]
+    partial class addingtablesforVG
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -36,6 +38,9 @@ namespace assignment_api.Migrations
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("EntityId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ErrandId")
                         .HasColumnType("int");
@@ -131,7 +136,7 @@ namespace assignment_api.Migrations
             modelBuilder.Entity("assignment_api.Models.Entities.CommentEntity", b =>
                 {
                     b.HasOne("assignment_api.Models.Entities.ErrandEntity", "Errand")
-                        .WithMany("Comments")
+                        .WithMany()
                         .HasForeignKey("ErrandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -156,11 +161,6 @@ namespace assignment_api.Migrations
                     b.Navigation("Status");
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("assignment_api.Models.Entities.ErrandEntity", b =>
-                {
-                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("assignment_api.Models.Entities.StatusEntity", b =>

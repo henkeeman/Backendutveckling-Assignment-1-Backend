@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace assignment_api.Controllers
 {
@@ -22,11 +23,11 @@ namespace assignment_api.Controllers
         public async Task<IActionResult> GetAll()
         {
             var errands = new List<ErrandResponse>();
-            foreach (var errand in await _context.Errands.Include(x => x.Status).ToListAsync())
+            foreach (var errand in await _context.Errands.Include(x => x.Status).Include(x => x.User).ToListAsync())
                 errands.Add(new ErrandResponse
                 {
                     Id = errand.Id,
-                    Email = errand.Email,
+                    User = errand.User,
                     Title = errand.Title,
                     Created = errand.Created,
                     Description = errand.Description,
@@ -36,29 +37,88 @@ namespace assignment_api.Controllers
             return new OkObjectResult(errands);
         }
 
+        [HttpGet("GetErrand/{id}")]
+        public async Task<IActionResult> GetErrand(int id)
+        {
+            var _errand = await _context.Errands.Include(x => x.Status).Include(x => x.Comments).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id);
+
+            if (_errand != null)
+            {
+                var comments = new List<CommentResponse>();
+                if (_errand.Comments != null)
+                {
+                    if(_errand.Comments != null)
+                    {
+                        foreach (var comment in _errand.Comments)
+                        comments.Add(new CommentResponse
+                        {
+                            Created = comment.Created,
+                            Comment = comment.Comment
+
+                        });
+                    }
+                    
+                }
+                if (_context.Errands == null)
+                {
+                    return NotFound();
+                }
+                var errand = new ErrandResponse
+                {
+                    Id = _errand.Id,
+                    User = _errand.User,
+                    Title = _errand.Title,
+                    Created = _errand.Created,
+                    Description = _errand.Description,
+                    Status = _errand.StatusId,
+                    Comments = comments
+                };
+                return new OkObjectResult(errand);
+            }
+            else
+            {
+                return new NotFoundResult();
+            }
+
+
+
+
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(ErrandRequest req)
         {
-            var errandEntity = new ErrandEntity
+            try
             {
-                Email = req.Email,
-                Title = req.Title,
-                Description = req.Description,
-                StatusId = req.StatusId
-            };
-            if(errandEntity.StatusId <= 0 || errandEntity.StatusId > 3)
-            {
-                errandEntity.StatusId = 1;
+                var tempUser = await _context.Users.Where(x => x.Email == req.Email).FirstOrDefaultAsync();
+                var errandEntity = new ErrandEntity
+                {
+                    UserId = tempUser.Id,
+                    Title = req.Title,
+                    Description = req.Description,
+                    StatusId = req.StatusId
+                };
+                if (errandEntity.StatusId <= 0 || errandEntity.StatusId > 3)
+                {
+                    errandEntity.StatusId = 1;
 
+                }
+                _context.Add(errandEntity);
+                await _context.SaveChangesAsync();
+                return new OkObjectResult(errandEntity);
+
+                
             }
-            _context.Add(errandEntity);
-            await _context.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                //Debug.WriteLine(ex.Message);
+                return new NotFoundResult();
+            }
 
-
-            return new OkResult(); 
         }
+        
         [HttpPut("{id}")]
-        public async Task<ActionResult> Update(int id, ErrandUpdateRequest req)
+        public async Task<IActionResult> Update(int id, ErrandUpdateRequest req)
         {
             try
             {

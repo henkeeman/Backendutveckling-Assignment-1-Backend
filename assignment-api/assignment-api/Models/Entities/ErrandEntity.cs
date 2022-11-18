@@ -7,9 +7,6 @@ namespace assignment_api.Models.Entities
     {
         [Key]
         public int Id { get; set; }
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
 
         [Required]
         [StringLength(100)]
@@ -20,7 +17,10 @@ namespace assignment_api.Models.Entities
         public int StatusId { get; set; }
         public StatusEntity Status { get; set; }
 
+        public int UserId { get; set; }
+        public UserEntity User { get; set; }
 
+        public ICollection<CommentEntity> Comments { get; set; }
 
     }
 }
