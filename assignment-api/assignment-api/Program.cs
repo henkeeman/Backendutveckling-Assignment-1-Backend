@@ -10,7 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
 builder.Services.AddDbContext<DataContext>(x => 
-    x.UseSqlServer(builder.Configuration.GetConnectionString("Sql")));
+    x.UseSqlServer(builder.Configuration.GetConnectionString("SqlVG")));
 
 
 var app = builder.Build();
